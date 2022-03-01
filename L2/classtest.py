@@ -22,10 +22,20 @@ class Tiger(Sprite):
         self.rotation = random()*360
         self.opacity = random()*55
         self.layer = randint(0,2)
+class Fireball(Sprite):
+    def on_create(self):
+        self.image = "fireball.gif"
+        self.set_random_color()
+        self.goto_random_position()
+        self.scale = random()*10
+        self.rotation = random()*360
+        self.opacity = random()*55
+        self.layer = randint(0,2)
 
 for i in range(50):
     owl=w.create_sprite(Owl)
     tiger=w.create_sprite(Tiger)
+    fireball = w.create_sprite(Fireball)
 print(owl.number)
 print(tiger.number)
 w.run()
