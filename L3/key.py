@@ -6,7 +6,7 @@ class Owl(Sprite):
         self.x = 0
         self.y = 500
     def on_update(self, dt):
-        if w.is_key_down(KeyCode.O):
+        if w.is_key_pressed(KeyCode.O):
             self.x += 10
         self.set_random_color()
         if self.x >= w.width:
@@ -18,7 +18,7 @@ class Fireball(Sprite):
         self.x = 0
         self.y = 180
     def on_update(self, dt):
-        if w.is_key_down(KeyCode.F):
+        if w.is_key_pressed(KeyCode.F):
             self.x += 10
         self.set_random_color()
         if self.x >= w.width:
