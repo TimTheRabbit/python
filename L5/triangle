@@ -1,4 +1,3 @@
-
 from pycat.core import Window,Sprite,KeyCode,RotationMode,Scheduler
 from random import random,randint
 
@@ -83,13 +82,18 @@ class Timer(Sprite):
         self.current_time += dt
         if self.current_time >= self.wait_time:
             self.current_time = 0
-            self.wait_time = randint(1,3)
+            self.wait_time = randint(1,5)
             if randint(1,3) == 1:
                 create_gem()
             elif randint == 2:    
+                create_gem()
+            elif randint == 3:    
+                create_tri()
+            elif randint == 4:    
                 create_tri()
             else:
                 create_power()
+                
 class Power(Sprite):
     def on_create(self):
         self.y = 600
