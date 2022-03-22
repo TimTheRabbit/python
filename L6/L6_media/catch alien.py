@@ -20,12 +20,23 @@ class Ship(Sprite):
         self.rotation = 0
         self.rotation_mode = RotationMode.RIGHT_LEFT
         self.score = 0
+        self.has_won = False
+        self.wintime = 0
     def on_update(self, dt):
         self.move_forward(randint(3,5))
         if self.x >= 1200:
             self.rotation = 180
         elif self.x <= 0:
             self.rotation = 0
+        if not self.has_won:
+            if self.score >= 50:
+                s_win.play()
+                self.has_won = True
+                print("You win")
+        else:
+            self.wintime += dt
+            if self.wintime >= 1:
+                w.close()
 
 class Alien(Sprite):
     def on_create(self):
@@ -34,10 +45,8 @@ class Alien(Sprite):
         self.scale = 0.3
         self.y = 50
         self.movement = 1
-        self.has_won = False
         self.xsp = randint(3,7)
         self.ysp = 10
-        self.wintime = 0
         
     def on_update(self, dt):
         if self.movement == 1:
@@ -60,15 +69,7 @@ class Alien(Sprite):
                 ship.score += 1
                 print(str(ship.score))
                 label_score.text  = ("score: " + str(ship.score))
-        if not self.has_won:
-            if ship.score >= 1:
-                s_win.play()
-                self.has_won = True
-                print("You win")
-        else:
-            self.wintime += dt
-            if self.wintime >= 1:
-                w.close()
+        
             
         
     def on_left_click(self):
