@@ -50,7 +50,7 @@ class Alien(Sprite):
         
     def on_update(self, dt):
         if self.movement == 1:
-            self.ysp -=0.5
+            self.ysp -= 0.5
             if self.y == 50:
                 self.ysp = 10 
             self.x += self.xsp
