@@ -1,4 +1,3 @@
-from numpy import dtype
 from pycat.core import Window,Sprite,Scheduler,KeyCode,RotationMode
 from random import randint
 
