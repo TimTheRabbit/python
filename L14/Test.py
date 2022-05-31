@@ -13,15 +13,15 @@ class Player (Sprite):
         self.bn = 0
         l.text = "48"
     def on_update(self, dt):
-        if w.is_key_pressed('w'):
+        if w.is_key_pressed("w"):
             self.y += self.ysp
-        if w.is_key_pressed('s'):
+        if w.is_key_pressed("s"):
             self.y -= self.ysp
-        if w.is_key_pressed('a'):
+        if w.is_key_pressed("a"):
             self.x -= self.xsp
-        if w.is_key_pressed('d'):
+        if w.is_key_pressed("d"):
             self.x += self.xsp
-        if w.is_key_pressed('r'):
+        if w.is_key_pressed("r"):
             self.goto_random_position()
 
     def on_left_click_anywhere(self):
