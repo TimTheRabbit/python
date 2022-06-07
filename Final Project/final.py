@@ -75,6 +75,8 @@ class Player2 (Sprite):
             self.rotation -= 5
         if w.is_key_pressed("m"):
             self.goto_random_position()
+        if w.is_key_pressed("n"):
+            self.guntype += 1
         if w.is_key_down("k"):   
             self.image = "p2a.png"
             if self.guntype%2 == 1:
