@@ -1,4 +1,3 @@
-from pickle import FALSE, TRUE
 from pycat.core import Window,Sprite,Color,Scheduler,KeyCode
 import random
 
@@ -30,19 +29,23 @@ class Player (Sprite):
             self.rotation -= 5
         if w.is_key_pressed("q"):
             self.goto_random_position()
-        if w.is_key_pressed("f"):
+        if w.is_key_down("f"):
             self.guntype += 1
         if w.is_key_down("e"):
             self.image = "p1a.png"
-            if self.guntype%2 == 1:
+            if self.guntype%3 == 1:
                 b1 = w.create_sprite(BulletNormal)
                 b1.type = "p1"
-                b1.rotation = self.rotation
+                b1.rotation = self.rotation+180
                 b1.position = self.position
-            if self.guntype %2 == 0:
+            if self.guntype %3 == 2:
                 b1 = w.create_sprite(BulletSpeed)
                 b1.type = "p1"
-                b1.rotation = self.rotation
+                b1.rotation = self.rotation+180
+                b1.position = self.position
+            if self.guntype %3 == 0:
+                b1 = w.create_sprite(BulletAuto)
+                b1.type = "p1"
                 b1.position = self.position
             if self.changetime <= self.time:    
                 self.image = "p1.png"
@@ -75,21 +78,28 @@ class Player2 (Sprite):
             self.rotation -= 5
         if w.is_key_pressed("m"):
             self.goto_random_position()
-        if w.is_key_pressed("n"):
+        if w.is_key_down("n"):
             self.guntype += 1
         if w.is_key_down("k"):   
             self.image = "p2a.png"
-            if self.guntype%2 == 1:
+            if self.guntype%3 == 1:
                 b1 = w.create_sprite(BulletNormal)
                 b1.type = "p2"
-                b1.rotation = self.rotation
+                b1.rotation = self.rotation+180
                 b1.position = self.position
-            if self.guntype %2 == 0:
+                print(self.guntype)
+            if self.guntype %3 == 2:
                 b1 = w.create_sprite(BulletSpeed)
                 b1.type = "p2"
-                b1.rotation = self.rotation
+                b1.rotation = self.rotation+180
                 b1.position = self.position
-                if self.changetime <= self.time:    
+                print(self.guntype)
+            if self.guntype %3 == 0:
+                b1 = w.create_sprite(BulletAuto)
+                b1.type = "p2"
+                b1.position = self.position
+                print(self.guntype)
+            if self.changetime <= self.time:    
                     self.image = "p2.png"
                     self.time = 0
 
@@ -116,8 +126,31 @@ class BulletSpeed(Sprite):
         self.type = "x"
         self.add_tag("bullet")
         self.color = Color.GREEN
-        self.speed = 2.5
-        self.scale = 10
+        self.speed = 10
+        self.scale = 5
+    def on_update(self, dt):        
+        if self.is_touching_window_edge():
+            self.delete()
+        self.move_forward(self.speed)
+        if self.type == "p1":
+            if self.is_touching_sprite(p2):
+                self.delete()
+                p2.life -= 1
+        if self.type == "p2":
+            if self.is_touching_sprite(p):
+                self.delete()
+                p.life -= 1
+class BulletAuto(Sprite):
+    def on_create(self):
+        self.type = "x"
+        self.add_tag("bullet")
+        self.color = Color.YELLOW
+        self.speed = 5
+        self.scale = 2.5
+        if self.type == "p1":
+            self.point_toward_sprite(p2)
+        if self.type == "p2":
+            self.point_toward_sprite(p)
     def on_update(self, dt):        
         if self.is_touching_window_edge():
             self.delete()
