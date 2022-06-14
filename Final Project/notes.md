@@ -12,13 +12,9 @@ enemy
 gun1
 gun2
 gun3
+gun4
 switching gun
-
-6/14
-gun 4
 life,score
-level2 design
-collect
 
-6/21
-level2 establish
+home:
+power up
