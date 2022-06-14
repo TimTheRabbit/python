@@ -1,5 +1,8 @@
+from turtle import color
 from pycat.core import Window,Sprite,Color,Scheduler,KeyCode
 import random
+
+from sympy import ordered
 
 
 w = Window(width=1200,height=600)
@@ -8,15 +11,21 @@ class Player (Sprite):
         self.x = 300
         self.y = 300
         self.scale = 1
-        self.life = 3
+        self.life = 10
         self.score = 0
         self.image = "p1.png"
         self.bn = 0
-        self.speed = 3
+        self.speed = 2.5
+        self.layer = 0
         self.time = 0
         self.changetime = 0.6
         self.guntype = 1
-        
+    def hurt(self):
+        self.life -= 1
+        p1life.text = "P1 Life:" + str(self.life) 
+    def getpoint(self):
+        self.score += 5
+        p1score.text = "P1 Score:" + str(self.score)
     def on_update(self, dt):
         self.time += dt
         if w.is_key_pressed("w"):
@@ -35,21 +44,34 @@ class Player (Sprite):
             self.image = "p1a.png"
             if self.guntype%3 == 1:
                 b1 = w.create_sprite(BulletNormal)
-                b1.type = "p1"
-                b1.rotation = self.rotation+180
+                b1.add_tag("p1b")
+                b1.rotation = self.rotation
                 b1.position = self.position
             if self.guntype %3 == 2:
                 b1 = w.create_sprite(BulletSpeed)
-                b1.type = "p1"
-                b1.rotation = self.rotation+180
+                b1.add_tag("p1b")
+                b1.rotation = self.rotation
                 b1.position = self.position
             if self.guntype %3 == 0:
                 b1 = w.create_sprite(BulletAuto)
-                b1.type = "p1"
+                b1.add_tag("p1b")
                 b1.position = self.position
             if self.changetime <= self.time:    
                 self.image = "p1.png"
                 self.time = 0
+        if self.life <= 0:
+            Scheduler.cancel_update(create_enemy)
+            p2.score += 20
+            p2score.text = "P2 Score:" + str(p2.score)
+            w.delete_all_sprites()
+            
+            if self.score >= p2.score:
+                w.create_label(text = "P1 win!!!",color = Color.BLUE,font_size = 100,x = 640,y = 320)
+            elif self.score <= p2.score:
+                w.create_label(text = "P2 win!!!",color = Color.GREEN,font_size = 100,x = 640,y = 320)
+            elif self.score == p2.score:
+                w.create_label(text = "Tied!!!",color = Color.RED,font_size = 100,x = 640,y = 320)
+            
             
 
 class Player2 (Sprite):
@@ -57,15 +79,22 @@ class Player2 (Sprite):
         self.x = 900
         self.y = 300
         self.scale = 1
-        self.life = 3
+        self.life = 10
         self.score = 0
         self.bn = 0
-        self.speed = 3
+        self.speed = 2.5
         self.image = "p2.png"
         self.rotation = 0
         self.time = 0
         self.changetime = 0.6
+        self.layer = 0
         self.guntype = 1
+    def getpoint(self):
+        self.score += 5
+        p2score.text = "P2 Score:" + str(self.score)
+    def hurt(self):
+        self.life -= 1
+        p2life.text = "P2 Life:" + str(self.life)
     def on_update(self, dt):   
         self.time += dt    
         if w.is_key_pressed(KeyCode.UP):
@@ -84,85 +113,99 @@ class Player2 (Sprite):
             self.image = "p2a.png"
             if self.guntype%3 == 1:
                 b1 = w.create_sprite(BulletNormal)
-                b1.type = "p2"
+                b1.add_tag("p2b")
                 b1.rotation = self.rotation+180
                 b1.position = self.position
                 print(self.guntype)
             if self.guntype %3 == 2:
                 b1 = w.create_sprite(BulletSpeed)
-                b1.type = "p2"
+                b1.add_tag("p2b")
                 b1.rotation = self.rotation+180
                 b1.position = self.position
                 print(self.guntype)
             if self.guntype %3 == 0:
                 b1 = w.create_sprite(BulletAuto)
-                b1.type = "p2"
+                b1.add_tag("p2b")
                 b1.position = self.position
                 print(self.guntype)
             if self.changetime <= self.time:    
                     self.image = "p2.png"
                     self.time = 0
+        if self.life <= 0:
+            Scheduler.cancel_update(create_enemy)
+            p1.score += 20
+            p1score.text = "P1 Score:" + str(p1.score)
+            w.delete_all_sprites()
+            
+            if self.score >= p1.score:
+                w.create_label(text = "P2 win!!!",color = Color.GREEN,font_size = 100,x = 640,y = 320)
+            elif self.score <= p1.score:
+                w.create_label(text = "P1 win!!!",color = Color.BLUE,font_size = 100,x = 640,y = 320)
+            elif self.score == p1.score:
+                w.create_label(text = "Tied!!!",color = Color.RED,font_size = 100,x = 640,y = 320)
+        
+
 
 class BulletNormal(Sprite):
     def on_create(self):
-        self.type = "x"
-        self.add_tag("bullet")
-        self.speed = 2.5
+        
+        self.speed = 3
         self.scale = 5
+        self.layer = 0
     def on_update(self, dt):        
         if self.is_touching_window_edge():
             self.delete()
         self.move_forward(self.speed)
-        if self.type == "p1":
+        if "p1b" in self.tags:
             if self.is_touching_sprite(p2):
                 self.delete()
-                p2.life -= 1
-        if self.type == "p2":
-            if self.is_touching_sprite(p):
+                p2.hurt()
+        if "p2b" in self.tags:
+            if self.is_touching_sprite(p1):
                 self.delete()
-                p.life -= 1
+                p1.hurt()
 class BulletSpeed(Sprite):
     def on_create(self):
-        self.type = "x"
-        self.add_tag("bullet")
         self.color = Color.GREEN
         self.speed = 10
+        self.layer = 0
         self.scale = 5
     def on_update(self, dt):        
         if self.is_touching_window_edge():
             self.delete()
         self.move_forward(self.speed)
-        if self.type == "p1":
+        if "p1b" in self.tags:
             if self.is_touching_sprite(p2):
                 self.delete()
-                p2.life -= 1
-        if self.type == "p2":
-            if self.is_touching_sprite(p):
+                p2.hurt()
+        if "p2b" in self.tags:
+            if self.is_touching_sprite(p2):
                 self.delete()
-                p.life -= 1
+                p2.hurt()
 class BulletAuto(Sprite):
     def on_create(self):
-        self.type = "x"
-        self.add_tag("bullet")
         self.color = Color.YELLOW
         self.speed = 5
         self.scale = 2.5
-        if self.type == "p1":
-            self.point_toward_sprite(p2)
-        if self.type == "p2":
-            self.point_toward_sprite(p)
+        self.layer = 0
+        if "p1b"in self.tags:
+            self.pointx = p2.x
+            self.pointy = p2.y
+            self.point_toward(self.pointx,self.pointy)
+        if "p2b"in self.tags:
+            self.point_toward_sprite(p1)
     def on_update(self, dt):        
         if self.is_touching_window_edge():
             self.delete()
         self.move_forward(self.speed)
-        if self.type == "p1":
+        if "p1b" in self.tags:
             if self.is_touching_sprite(p2):
                 self.delete()
-                p2.life -= 1
-        if self.type == "p2":
-            if self.is_touching_sprite(p):
+                p2.hurt()
+        if "p1b" in self.tags:
+            if self.is_touching_sprite(p2):
                 self.delete()
-                p.life -= 1
+                p2.hurt()
 class Enemies(Sprite):
     def on_create(self):
         self.goto_random_position()
@@ -170,33 +213,39 @@ class Enemies(Sprite):
         self.speed = 2
         self.scale = 25
         self.time = 0
+        self.layer = 0
         self.shottime = 2
         self.onattack = random.randint(1,2)
     def on_update(self, dt):
         if self.onattack == 1:
-            self.point_toward_sprite(p)
+            self.point_toward_sprite(p1)
         if self.onattack == 2:
             self.point_toward_sprite(p2)
         self.time += dt
         self.move_forward(self.speed)
         if self.is_touching_window_edge():
             self.delete()
-        if self.is_touching_sprite(p):
+        if self.is_touching_sprite(p1):
+            p1.hurt()
             self.delete()
-            p.life -= 1
-            p.score += 1
+            
         if self.is_touching_sprite(p2):
+            p2.hurt()
+            self.delete()    
+        if self.is_touching_any_sprite_with_tag("p1b"):
+            p1.getpoint()
+            print("touch p1b")
+            self.delete()    
+        if self.is_touching_any_sprite_with_tag("p2b"):
+            p2.getpoint()
+            print("touch p2b")
             self.delete()
-            p2.life -= 1
-            p2.score += 1
-        if self.is_touching_any_sprite_with_tag("bullet"):
-            self.delete()
-            p.score += 1
+        
         if self.time >= self.shottime:
             ebullet = w.create_sprite(EnemyBullet)
             ebullet.position = self.position
             if self.onattack == 1:
-                ebullet.point_toward_sprite(p)
+                ebullet.point_toward_sprite(p1)
                 ebullet.point = 1
                 self.onattack = 2
             if self.onattack == 2:
@@ -209,22 +258,34 @@ class EnemyBullet(Sprite):
         self.point = 0
         self.scale = 5
         self.speed = 6
+        self.layer = 0
     def on_update(self, dt):
         
         if self.is_touching_window_edge():
             self.delete() 
         if self.point == 1:   
-            self.point_toward_sprite(p)
-            if self.is_touching_sprite(p):
+            self.point_toward_sprite(p1)
+            if self.is_touching_sprite(p1):
                 self.move_forward(-self.speed)
                 self.delete()
-                p.life -= 1
+                p1.hurt()
         if self.point == 2: 
             self.move_forward(self.speed) 
             self.point_toward_sprite(p2) 
             if self.is_touching_sprite(p2):
                 self.delete()
-                p2.life -= 1
+                p2.hurt()
+class Power(Sprite):
+    def on_create(self):
+        self.scale = 10
+        self.order = [1,2,3,4,5,6]
+        random.shuffle(self.order)
+        self.time = 0
+        self.now_type = self.order[1]
+        
+    def on_update(self, dt):
+        self.time += dt
+        self.add_tag(str(self.now_type))
 
 
 
@@ -244,6 +305,10 @@ class EnemyBullet(Sprite):
 def create_enemy():
     w.create_sprite(Enemies)
 Scheduler.update(create_enemy,2)
-p = w.create_sprite(Player)
+p1 = w.create_sprite(Player)
 p2 = w.create_sprite(Player2)
+p1life = w.create_label(text = "P1 Life:10")
+p2life = w.create_label(text = "P2 Life:10",x = 1050)
+p1score = w.create_label(text = "P1 Score:0",y = 570)
+p2score = w.create_label(text = "P2 Score:0",x = 1050,y = 570)
 w.run()

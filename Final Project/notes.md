@@ -11,13 +11,14 @@ players
 enemy
 gun1
 gun2
+gun3
 switching gun
 
 6/14
-bullet3,4
+gun 4
 life,score
 level2 design
+collect
 
 6/21
 level2 establish
-brother jay bullet(bonus)
