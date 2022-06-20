@@ -1,8 +1,6 @@
-from turtle import color
 from pycat.core import Window,Sprite,Color,Scheduler,KeyCode
 import random
 
-from sympy import ordered
 
 
 w = Window(width=1200,height=600)
@@ -20,6 +18,7 @@ class Player (Sprite):
         self.time = 0
         self.changetime = 0.6
         self.guntype = 1
+        self.add_tag("players")
     def hurt(self):
         self.life -= 1
         p1life.text = "P1 Life:" + str(self.life) 
@@ -78,6 +77,7 @@ class Player2 (Sprite):
     def on_create(self):
         self.x = 900
         self.y = 300
+        self.add_tag("players")
         self.scale = 1
         self.life = 10
         self.score = 0
@@ -281,13 +281,31 @@ class Power(Sprite):
         self.order = [1,2,3,4,5,6]
         random.shuffle(self.order)
         self.time = 0
-        self.now_type = self.order[1]
         
+
     def on_update(self, dt):
+        self.now_type = self.order[1]
+        self.change_costume()
         self.time += dt
-        self.add_tag(str(self.now_type))
+        if self.time <= 5: 
+            if self.is_touching_any_sprite_with_tag("player"):
+                if self.now_type == 1:
+                    pass
 
 
+    def change_costume(self):
+        if self.now_type == 1:
+            self.image = "costume1.png"
+        elif self.now_type == 2:
+            self.image = "costume2.png"
+        elif self.now_type == 3:
+            self.image = "costume3.png"
+        elif self.now_type == 4:
+            self.image = "costume4.png"
+        elif self.now_type == 5:
+            self.image = "coustume5.png"
+        else:
+            self.image = "costume6.png"
 
 
 
