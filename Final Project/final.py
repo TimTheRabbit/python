@@ -1,6 +1,8 @@
 from pycat.core import Window,Sprite,Color,Scheduler,KeyCode
 import random
 
+from pyglet.libs.darwin.cocoapy.cocoalibs import NSMiniaturizableWindowMask
+
 
 
 w = Window(width=1200,height=600)
@@ -19,6 +21,27 @@ class Player (Sprite):
         self.changetime = 0.6
         self.guntype = 1
         self.add_tag("players")
+    def power(self):
+        if power.now_type == 1:
+            self.score * 2
+            power.order[1]
+            p1score.text = "P1 Score:" + str(self.score)
+        elif power.now_type == 2:
+            self.score * 3
+            power.order[1]
+            p1score.text = "P1 Score:" + str(self.score)
+        elif power.now_type == 3:
+            self.life * 2
+            power.order[1]
+            p1life.text = "P1 Life:" + str(self.life)
+        elif power.now_type == 5:
+            self.life  = 10
+            power.order[1]
+            p1life.text = "P1 Life:" + str(self.life)
+        elif power.now_type == 6:
+            p2.life = 1
+            power.order[1]
+            p2life.text = "P2 Life:" + str(self.life)
     def hurt(self):
         self.life -= 1
         p1life.text = "P1 Life:" + str(self.life) 
@@ -95,6 +118,27 @@ class Player2 (Sprite):
     def hurt(self):
         self.life -= 1
         p2life.text = "P2 Life:" + str(self.life)
+    def power(self):
+        if power.now_type == 1:
+            self.score * 2
+            p2score.text = "P2 Score:" + str(self.score)
+            del power.order[1]
+        elif power.now_type == 2:
+            self.score * 3
+            del power.order[1]
+            p2score.text = "P2 Score:" + str(self.score)
+        elif power.now_type == 3:
+            self.life * 2
+            del power.order[1]
+            p2life.text = "P2 Life:" + str(self.life)
+        elif power.now_type == 5:
+            self.life  = 10
+            power.order[1]
+            p2life.text = "P2 Life:" + str(self.life)
+        elif power.now_type == 6:
+            p1.life = 1
+            power.order[1]
+            p1life.text = "P1 Life:" + str(self.life)
     def on_update(self, dt):   
         self.time += dt    
         if w.is_key_pressed(KeyCode.UP):
@@ -278,7 +322,7 @@ class EnemyBullet(Sprite):
 class Power(Sprite):
     def on_create(self):
         self.scale = 10
-        self.order = [1,2,3,4,5,6]
+        self.order = [1,2,3,5,6]
         random.shuffle(self.order)
         self.time = 0
         
@@ -287,10 +331,13 @@ class Power(Sprite):
         self.now_type = self.order[1]
         self.change_costume()
         self.time += dt
-        if self.time <= 5: 
-            if self.is_touching_any_sprite_with_tag("player"):
-                if self.now_type == 1:
-                    pass
+        if self.time >= 5: 
+            del self.order[1]
+        if self.is_touching_sprite(p1):
+            p1.power()
+        if self.is_touching_sprite(p2):
+            p2.power()
+            
 
 
     def change_costume(self):
@@ -329,4 +376,5 @@ p1life = w.create_label(text = "P1 Life:10")
 p2life = w.create_label(text = "P2 Life:10",x = 1050)
 p1score = w.create_label(text = "P1 Score:0",y = 570)
 p2score = w.create_label(text = "P2 Score:0",x = 1050,y = 570)
+power = w.create_sprite(Power)
 w.run()
