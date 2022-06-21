@@ -15,6 +15,5 @@ gun3
 gun4
 switching gun
 life,score
-
-home:
+doing:
 power up
